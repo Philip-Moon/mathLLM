@@ -164,7 +164,7 @@
 	  const promptText = methodCount === "1"
 	  ? questionText
 	  : `Give ${methodCount} different solution methods to the following math problem. 
-	  Each solution should be clearly distinct (e.g., algebraic, geometric, numeric, or logical), and fully explained step-by-step:\n\n${questionText}`;
+	  Each solution should be clearly distinct, and fully explained step-by-step:\n\n${questionText}`;
 	  
 	  appendMessage("user", questionText);
 	  conversation.push({ role: "user", content: promptText });
@@ -211,28 +211,6 @@
 		return msgDiv;
     }
 	
-	/*
-	function handleSelection(selectedContainer, selectedAnswer) {
-	  if (selectionMade) return;
-
-	  const chat = document.getElementById("chat");
-	  const messages = chat.querySelectorAll(".assistant");
-	  messages.forEach(msg => {
-		if (msg !== selectedContainer) {
-		  chat.removeChild(msg);
-		}
-	  });
-
-	  selectedContainer.style.border = "2px solid green";
-	  selectedContainer.style.backgroundColor = "#d4ffd4";
-	  selectedContainer.onclick = null;
-	  selectedContainer.style.cursor = "default";
-
-	  conversation.push({ role: "assistant", content: selectedAnswer });
-	  selectionMade = true;
-	}
-	*/
-	
 	function escapeMathForHTML(text) {
 		return text
 			.replace(/\\\(/g, '\\\\(')   // \( → \\(
@@ -245,6 +223,13 @@
 		const panel = document.getElementById("count-box");
 		panel.style.display = (panel.style.display === "none" || !panel.style.display) ? "flex" : "none";
 	}
+	
+	document.getElementById("question").addEventListener("keydown", function(event) {
+	  if (event.key === "Enter" && !event.shiftKey) {
+		event.preventDefault();
+		sendQuestion();
+	  }
+	});
 	
   </script>
 </body>
