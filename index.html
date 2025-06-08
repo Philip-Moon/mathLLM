@@ -138,7 +138,7 @@
 		<textarea id="question" placeholder="Ask a math question..." rows="4"></textarea>
 		<div id="right-controls">
 			<div id="count-box">
-				<label for="method-count">Answers:</label>
+				<label for="method-count">Methods:</label>
 				<select id="method-count">
 					<option value="1" selected>1</option>
 					<option value="2">2</option>
@@ -166,7 +166,7 @@
 	  : `Give ${methodCount} different solution methods to the following math problem. 
 	  Each solution should be clearly distinct (e.g., algebraic, geometric, numeric, or logical), and fully explained step-by-step:\n\n${questionText}`;
 	  
-	  appendMessage("user", promptText);
+	  appendMessage("user", questionText);
 	  conversation.push({ role: "user", content: promptText });
       input.value = "";
 	  
