@@ -10,7 +10,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/solve", async (req, res) => {
   const conversation = req.body.conversation || [];
-  const methodCount = parseInt(req.body.methodCount || "1");
 
   const messages = [
     { role: "system", content: "You are a helpful math tutor. Show step-by-step solutions." },
@@ -21,12 +20,11 @@ app.post("/solve", async (req, res) => {
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages,
-      temperature: 0.2 + 0.1 * n,
-	  n: methodCount,
+      temperature: 0.3,
     });
 
-    const answers = response.choices.map(choice => choice.message.content);
-    res.json({ answers });
+    const answer = response.choices[0].message.content;
+    res.json({ answer });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "OpenAI error" });

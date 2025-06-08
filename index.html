@@ -34,7 +34,6 @@
       padding: 2px 16px;
       margin: 8px;
       border-radius: 12px;
-      <!--white-space: pre-wrap;-->
 	  white-space: normal;
 	  word-wrap: break-word;
     }
@@ -155,54 +154,40 @@
 
   <script>
     const conversation = [];
-	let selectionMade = false;
 	
-    async function sendQuestion() {
-	  if (selectionMade === false && conversation.some(m => m.role === "assistant")) {
-		alert("Please select one of the solutions before continuing.");
-		return;
-	  }
-	  
-      const input = document.getElementById("question");
+    async function sendQuestion() {	  
+      const methodCount = document.getElementById("method-count").value; 
+	  const input = document.getElementById("question");
       const questionText = input.value.trim();
       if (!questionText) return;
 	  
-	  appendMessage("user", questionText);
-	  conversation.push({ role: "user", content: questionText });
+	  const promptText = methodCount === "1"
+	  ? questionText
+	  : `Give ${methodCount} different solution methods to the following math problem. 
+	  Each solution should be clearly distinct (e.g., algebraic, geometric, numeric, or logical), and fully explained step-by-step:\n\n${questionText}`;
+	  
+	  appendMessage("user", promptText);
+	  conversation.push({ role: "user", content: promptText });
       input.value = "";
 	  
-	  const methodCount = document.getElementById("method-count").value; 
 	  const thinkingMsg = appendMessage("assistant", "Thinking...");
 	  
-	  //const assistantMsg = appendMessage("assistant", "Thinking...");
       try {
         const response = await fetch("/solve", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ conversation, methodCount })
+          body: JSON.stringify({ conversation })
         });
 
         const data = await response.json();
-		const answers = data.answers || ["Error occurred."];
+		const answer = data.answer || "Error occurred.";
 		
-		//conversation.push({ role: "assistant", content: answer });
+		conversation.push({ role: "assistant", content: answer });
 		thinkingMsg.remove();
-		
-		answers.forEach((answer, idx) => {
-			const container = appendMessage("assistant", `**Solution ${idx + 1}:**\n\n${answer}`);
-			container.style.cursor = "pointer";
-			container.onclick = () => handleSelection(container, answer);
-		
-		});
-		
-		
-		//assistantMsg.innerHTML = marked.parse(escapeMathForHTML(answer));
+		appendMessage("assistant",answer);
       } catch (err) {
-		thinkingMsg.remove();
-		const errorMsg = appendMessage("assistant", `Error: ${err.message}`);
-		//assistantMsg.innerHTML = marked.parse(escapeMathForHTML("Error: " + err.message));
+		thinkingMsg.innerHTML = marked.parse(escapeMathForHTML("Error: " + err.message));
       }
-	  
     }
 	
 	function appendMessage(role, content) {
@@ -226,6 +211,7 @@
 		return msgDiv;
     }
 	
+	/*
 	function handleSelection(selectedContainer, selectedAnswer) {
 	  if (selectionMade) return;
 
@@ -245,6 +231,7 @@
 	  conversation.push({ role: "assistant", content: selectedAnswer });
 	  selectionMade = true;
 	}
+	*/
 	
 	function escapeMathForHTML(text) {
 		return text
@@ -258,7 +245,6 @@
 		const panel = document.getElementById("count-box");
 		panel.style.display = (panel.style.display === "none" || !panel.style.display) ? "flex" : "none";
 	}
-	
 	
   </script>
 </body>
